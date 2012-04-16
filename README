@@ -3,7 +3,12 @@ Carl Cochran
 A20144714
 
 
-This project is intended to model what would be the computerized system for tracking payments entitled to US military veterans who are eligible for the Post 9/11 GI Bill (Chapter 33).  The description of program eligibility can be found at http://www.gibill.va.gov/benefits/post_911_gibill/index.html and I will be developing the description of the software requirements, which may differ from the actual government program, in this document.
+This project is intended to model what would be the computerized system for tracking payments 
+entitled to US military veterans who are eligible for the Post 9/11 GI Bill (Chapter 33).  The 
+description of program eligibility can be found at 
+http://www.gibill.va.gov/benefits/post_911_gibill/index.html and I will be developing the 
+description of the software requirements, which may differ from the actual government program, 
+in this document.
 
 
 Requirements:
