@@ -3,43 +3,25 @@ Carl Cochran
 A20144714
 
 
-This project is intended to model what would be the computerized system for tracking payments 
-entitled to US military veterans who are eligible for the Post 9/11 GI Bill (Chapter 33).  The 
-description of program eligibility can be found at 
-http://www.gibill.va.gov/benefits/post_911_gibill/index.html and I will be developing the 
-description of the software requirements, which may differ from the actual government program, 
-in this document.
+This project is intended to model what would be the computerized system for tracking payments entitled to US military veterans who are eligible for the Post 9/11 GI Bill (Chapter 33).  The description of program eligibility can be found at http://www.gibill.va.gov/benefits/post_911_gibill/index.html and I will be developing the description of the software requirements, which may differ from the actual government program, in this document.
 
 
 Requirements:
 
 1. Determine whether to use data structures or data base or something else for tracking members.
 
-2. Maintain a list of maximum yearly benefit amounts for each US state and international area, 
-and list of housing allowance amounts by zip code.  These amounts are updated annually.  
-A look-up table of the amounts is available on the GI Bill website and may be inserted into a 
-data base or a data file.
+2. Maintain a list of maximum yearly benefit amounts for each US state and international area, and list of housing allowance amounts by zip code.  These amounts are updated annually.  A look-up table of the amounts is available on the GI Bill website and may be inserted into a data base or a data file.
 
-3. Maintain a complete file for each applicant.  Must include pertinent information from the 
-DD214 (the Department of Defense form which summarizes the veteran’s time on active duty and 
-type of discharge).  Type of discharge must be honorable to qualify veteran for this program.  
-Must include the actual tuition rate and mandatory fees of the member’s school so that it can 
-be compared with the maximum rate for its state.  Must include the zip code of the school, as 
-that will be used to determine the housing allowance rate.
+3. Maintain a complete file for each applicant.  Must include pertinent information from the DD214 (the Department of Defense form which summarizes the veteran’s time on active duty and type of discharge).  Type of discharge must be honorable to qualify veteran for this program.  Must include the actual tuition rate and mandatory fees of the member’s school so that it can be compared with the maximum rate for its state.  Must include the zip code of the school, as that will be used to determine the housing allowance rate.
 
-4. Track remaining entitlement.  Entitlement is measured in months and days (30-day month for 
-complete calendar months, pro-rated by days for incomplete calendar months).  Remaining 
-entitlement depends on amount of active duty following September 11, 2001.  
+4. Track remaining entitlement.  Entitlement is measured in months and days (30-day month for complete calendar months, pro-rated by days for incomplete calendar months).  Remaining entitlement depends on amount of active duty following September 11, 2001.  
 
-5. Members who have already used part of the previous version of the GI Bill (Chapter 30) may 
-transfer benefits to Chapter 33, as they both use the calendar month / day measurement system 
-and both typically have a 36-month maximum.  If a veteran has used all 36 months of entitlement 
-but has enough time in service after 9/11/2001, an additional 12 months of Chapter 33 may be awarded.
+5. Members who have already used part of the previous version of the GI Bill (Chapter 30) may transfer benefits to Chapter 33, as they both use the calendar month / day measurement system and both typically have a 36-month maximum.  If a veteran has used all 36 months of entitlement but has enough time in service after 9/11/2001, an additional 12 months of Chapter 33 may be awarded.
 
 
-Since Chapter 30 required an up-front payment of $1200 and Chapter 33 does not require this payment, 
-transferring benefits AND USING ALL ENTITLEMENT entitles the veteran to a pro-rated refund of the 
-$1200 payment.
+Since Chapter 30 required an up-front payment of $1200 and Chapter 33 does not require this payment, transferring benefits AND USING ALL ENTITLEMENT entitles the veteran to a pro-rated refund of the $1200 payment.
 
 6.
+
+
 
