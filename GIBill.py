@@ -1,4 +1,3 @@
-from datetime import date
 from easygui import *
 import member
 
@@ -11,19 +10,37 @@ def addMember(num):
     fieldValues = []        #init to blank
     fieldValues = multenterbox(msg,title,fieldNames)
 
+    #Check for fields left blank
     while 1:
         if fieldValues == None: break
         errmsg = ""
         for i in range(len(fieldNames)):
-            errmsg = errmsg + ('"%s" is a required field.' % fieldNames[i])
+            if fieldValues[i].strip() == "":
+                errmsg += ('"%s" is a required field.' % fieldNames[i])
+        print errmsg
         if errmsg == "": break                      #no errors
         fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)
-        
-    
-    x = Member.add(num, lname, fname, mi, zipCode, startYear, startMonth, startDay, endYear, endMonth, endDay)
+    lname = fieldValues[0]
+    fname = fieldValues[1]
+    mi = fieldValues[2]
+    zc = int(fieldValues[3])
+    ye = int(fieldValues[4])
+    me = int(fieldValues[5])
+    de = int(fieldValues[6])
+    yl = int(fieldValues[7])
+    ml = int(fieldValues[8])
+    dl = int(fieldValues[9])
+
+    print yl, ml, dl
+      
+    x = member.Member()
+    x.add(x, num, lname, fname, mi, ye, me, de, yl, ml, dl)
+    print x
+    exit()
     
 def editMember(num):
     print num
+    exit ()
     
 
 #Main Routine

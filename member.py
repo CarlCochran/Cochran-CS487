@@ -1,3 +1,4 @@
+from datetime import date
 
 class Member:
     
@@ -88,7 +89,6 @@ class Member:
         else:
             self.entitlementRate = 0
 
-        
         
 
 
