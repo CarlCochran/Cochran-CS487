@@ -1,5 +1,6 @@
 from easygui import *
 import member
+import MySQLdb as db
 
 
 def addMember(num):
@@ -31,15 +32,40 @@ def addMember(num):
     ml = int(fieldValues[8])
     dl = int(fieldValues[9])
 
-    print yl, ml, dl
       
     x = member.Member()
     x.add(x, num, lname, fname, mi, ye, me, de, yl, ml, dl)
-    print x
-    exit()
+    print x.memNum
+    
+    con = None
+    try:
+        con = db.connect('localhost','carl','graendal','gibillmembers');
+        cur = con.cursor()
+        cur.execute('INSERT INTO members VALUES (num)')
+        con.commit()
+        cur.close()
+
+    except db.Error, e:
+        print "Error %d: %s" % (e.args[0],e.args[1])
+      
+    return x
     
 def editMember(num):
-    print num
+    con = None
+    try:
+        con = db.connect('localhost','carl','graendal','gibillmembers');
+        cur = con.cursor()
+        cur.execute ("select * from members")
+        rows = cur.fetchall()
+        msg = ""
+        for row in rows:
+               msg += str(row)
+        choices = ["Edit","Cancel"]
+        reply = buttonbox(msg,choices=choices)
+
+    except db.Error, e:
+        print "Error %d: %s" % (e.args[0],e.args[1])
+        
     exit ()
     
 
@@ -49,7 +75,7 @@ while 1:
     a = choicebox(msg='Choose Mode',title='A',choices=('Add Member','Edit Member'))
     b = enterbox(msg='Enter 9-digit member number with no dashes.')
     if a == 'Add Member':
-        addMember(b)
+        x = addMember(b)
     else:
         editMember(b)
 
