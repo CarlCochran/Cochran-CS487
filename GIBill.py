@@ -34,14 +34,18 @@ def addMember(num):
 
       
     x = member.Member()
-    x.add(x, num, lname, fname, mi, ye, me, de, yl, ml, dl)
-    print x.memNum
-    
+    x.add(num, lname, fname, mi, zc, ye, me, de, yl, ml, dl)
+    print x.memNum, x.lname, x.fname, x.mi, x.zipCode, x.startYear, x.startMonth, x.startDay, x.endYear, x.endMonth, x.endDay
+
+    #Connect to database for adding new member
     con = None
     try:
         con = db.connect('localhost','carl','graendal','gibillmembers');
         cur = con.cursor()
-        cur.execute('INSERT INTO members VALUES (num)')
+        cur.execute('INSERT INTO members (id,lname,fname,mi,zipcode,yrEntered,moEntered,daEntered,yrLeft, \
+                    moLeft,daLeft) VALUES ("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s")' % \
+                    (x.memNum, x.lname, x.fname, x.mi, x.zipCode, x.startYear,\
+                    x.startMonth, x.startDay, x.endYear, x.endMonth, x.endDay))
         con.commit()
         cur.close()
 
@@ -49,8 +53,12 @@ def addMember(num):
         print "Error %d: %s" % (e.args[0],e.args[1])
       
     return x
+
+
     
 def editMember(num):
+
+    #Connect to database to look up existing member
     con = None
     try:
         con = db.connect('localhost','carl','graendal','gibillmembers');
