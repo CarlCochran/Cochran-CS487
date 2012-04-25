@@ -35,12 +35,14 @@ def addMember(num):
       
     x = member.Member()
     x.add(num, lname, fname, mi, zc, ye, me, de, yl, ml, dl)
-    print x.memNum, x.lname, x.fname, x.mi, x.zipCode, x.startYear, x.startMonth, x.startDay, x.endYear, x.endMonth, x.endDay
+    print x.memNum, x.lname, x.fname, x.mi, x.zipCode, x.startYear, \
+          x.startMonth, x.startDay, x.endYear, x.endMonth, x.endDay
 
     #Connect to database for adding new member
     con = None
     try:
-        con = db.connect('localhost','carl','graendal','gibillmembers');
+        con = db.connect(host = 'instance12186.db.xeround.com',port=3915, \
+                         user='carl',passwd='graendal',db='gibillmembers');
         cur = con.cursor()
         cur.execute('INSERT INTO members (id,lname,fname,mi,zipcode,yrEntered,moEntered,daEntered,yrLeft, \
                     moLeft,daLeft) VALUES ("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s")' % \
@@ -48,6 +50,7 @@ def addMember(num):
                     x.startMonth, x.startDay, x.endYear, x.endMonth, x.endDay))
         con.commit()
         cur.close()
+        con.close()
 
     except db.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
