@@ -11,16 +11,48 @@ def addMember(num):
     fieldValues = []        #init to blank
     fieldValues = multenterbox(msg,title,fieldNames)
 
+    
     #Check for fields left blank
     while 1:
-        if fieldValues == None: break
+        if fieldValues == None: return None
         errmsg = ""
         for i in range(len(fieldNames)):
+            if i == 2:                               #Skip middle initial, not required
+                continue
             if fieldValues[i].strip() == "":
                 errmsg += ('"%s" is a required field.' % fieldNames[i])
         print errmsg
         if errmsg == "": break                      #no errors
         fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)
+
+    #Input Validation
+    chars = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -')
+    numbers = set('0123456789')
+    while 1:
+        errmsg = ""
+        for i in range(len(fieldValues[0])):
+            if any ((c in chars) for c in fieldValues[0][i]):
+                continue
+            else:
+                errmsg += ('"%s" contains invalid characters.' % fieldNames[0])
+                break
+        for i in range(len(fieldValues[1])):
+            if any ((c in chars) for c in fieldValues[1][i]):
+                continue
+            else:
+                errmsg += ('"%s" contains invalid characters.' % fieldNames[1])
+                break    
+        if (len(fieldValues[2]) > 1 or not any((c in chars) for c in fieldValues[2])) and fieldValues[2] != "":
+            errmsg += ('"%s" contains invalid or too many characters.' % fieldNames[2])
+
+        if len(fieldValues[3]) != 5:
+            errmsg += ('"%s" is invalid.' % fieldNames[3])    
+
+        if errmsg == "": break                      #Input valid
+        fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)
+                           
+
+    #Input Validation Passed: Assign Values    
     lname = fieldValues[0]
     fname = fieldValues[1]
     mi = fieldValues[2]
@@ -137,19 +169,24 @@ def editMember(num):
     
 
 #Main Routine
-msgbox(msg='Post 9/11 GI Bill Member and Accounting System')
+msgbox(msg='Post 9/11 GI Bill Member and Accounting System\n\tby Carl Cochran')
 while 1:
-    a = choicebox(msg='Choose Mode',title='A',choices=('Add Member','View/Edit Member'))
-    if a == None:                                  #Cancel was clicked
+    a = choicebox(msg='Choose Mode',title='Post 9/11 GI Bill Member and Accounting System', \
+                  choices=('Add Member','View/Edit Member'))
+    if a == None:                                  #Cancel was clicked, exit program
         exit()
         
     b = enterbox(msg='Enter 9-digit member number with no dashes.')
-    if a == 'Add Member':
-        x = addMember(b)
+    if b == None:                                   #Cancel was clicked: return to main menu
+        continue
+    elif str.isdigit(b) and int(b) >= 100000000 and int(b) <= 999999999: #input validation: must be a number
+                                                                         #from 100000000 to 999999999
+        if a == 'Add Member':
+            x = addMember(b)
+        else:
+            x = editMember(b)
     else:
-        x = editMember(b)
-
-
+        msgbox(msg='Invalid ID Number.  Must be exactly 9 digits long, only numbers 0-9.')
 
 
     

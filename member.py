@@ -14,13 +14,6 @@ class Member:
         #Member's date of entry and exit from active duty
         self.startYear = []
         self.startMonth = []
-        self.startDay = []
-        self.endYear = []
-        self.endMonth = []
-        self.endDay = []
-
-        #Member's entitlement to Ch33
-        self.totalService = []
         self.qualifiedServiceDays = []
         self.qualifiedServiceMonths = []
         
