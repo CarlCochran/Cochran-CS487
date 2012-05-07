@@ -4,6 +4,24 @@ import MySQLdb as db
 
 
 def addMember(num):
+    #Check if member already exists
+    try:
+        con = db.connect(host = 'instance12186.db.xeround.com',port=3915, \
+                         user='carl',passwd='graendal',db='gibillmembers');
+        cur = con.cursor()
+        cur.execute ("select * from members where id = %s", (num)) #to select one member
+        if cur.fetchone():
+            msgbox(msg = "ID already exists in database.")
+            x = editMember(num)
+            return x
+
+        cur.close()
+        con.close()
+    except db.Error, e:
+        print "Error %d: %s" % (e.args[0],e.args[1])
+
+
+        
     msg = "Enter New Member Information"
     title = "Add New Member"
     msg = "Member Number: ",num
@@ -86,13 +104,15 @@ def addMember(num):
 
     except db.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
-      
+
+
+    x = editMember(num)  
     return x
 
 
     
 def editMember(num):
-
+    print ('Edit Mode Initiated')
     #Connect to database to look up existing member
     con = None
     try:
@@ -100,7 +120,15 @@ def editMember(num):
                          user='carl',passwd='graendal',db='gibillmembers');
         cur = con.cursor()
         cur.execute ("select * from members where id = %s", (num)) #to select one member
+           
         row = cur.fetchone()
+        if not row:                                      #Check whether id exists in DB
+            msgbox(msg='No member found with this ID.')
+            cur.close()
+            con.close()
+            return None
+
+        
         desc = cur.description                            #for column headers
         msg = ""
         for field in range(11):
@@ -160,6 +188,7 @@ def editMember(num):
             cur.close()
             con.close()
 
+            x = editMember(num)
             return x
 
     except db.Error, e:
