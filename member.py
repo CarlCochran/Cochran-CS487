@@ -14,12 +14,19 @@ class Member:
         #Member's date of entry and exit from active duty
         self.startYear = []
         self.startMonth = []
+        self.startDay = []
+        self.endYear = []
+        self.endMonth = []
+        self.endDay = []
+
+        #Member's Qualification
         self.qualifiedServiceDays = []
         self.qualifiedServiceMonths = []
-        
-        self.totalEntitlementDays = []
+
+        self.entitlementRate = []        
+        self.entitlementRemainingMonths = []
         self.entitlementRemainingDays = []
-        self.entitlementRate = []
+
         
 
     def add(self, memNum, lname, fname, mi, zipCode, startYear, startMonth,
@@ -38,22 +45,53 @@ class Member:
         self.endDay = endDay
 
         #Use service dates to calculate days of entitlement
-        #self.calculateEntitlement()
+        self.calculateEntitlement()
         
 
     def calculateEntitlement(self):
         #Ch33 Entitlement is based only on service dates on and after 9/11/2001
         d0 = date(2001, 9, 11)
-        dStart = date(self.startYear, self.startMonth, self.startDay)
-        dEnd = date(self.endYear, self.endMonth, self.endDay)
-        self.totalService = dEnd - dStart
-        
-        if ((dStart - d0).days < 0):
-            self.qualifiedServiceDays = (dEnd - d0).days
-        else:
-            self.qualifiedServiceDays = self.totalService.days
 
-        self.qualifiedServiceMonths = float(self.qualifiedServiceDays) / (365.2425/12)
+        #Insufficient built-in date math for 'datetime' - full months are counted
+        #as 30 days regardless of their length.
+        #Initialize date objects to determine the months and days between them
+        serviceMonths = 0          #rate is based on months of service
+        serviceDays = 0            #Used to calculate partial months    
+        dStart = date(int(self.startYear), int(self.startMonth), int(self.startDay))
+        if dStart < d0:
+            dStart = d0            #Qualified active duty only after 9/11/2001
+        dEnd = date(int(self.endYear), int(self.endMonth), int(self.endDay))
+        dTemp = dStart
+
+
+
+        #count qualified days and months
+        dayDelta = d0-date(2001,9,10)       #one day for incrementing
+        monthDelta = d0-date(2001,8,11)     #one month for incrementing
+        
+        #First partial month:
+        if dStart.day > 1:
+            while dTemp.day >= dStart.day and dStart.month == dTemp.month and dTemp <= dEnd:
+                dTemp = dTemp + dayDelta #Day will always end up as 1
+                serviceDays = serviceDays + 1
+
+        #All full months:
+        while dTemp < dEnd:
+            dTemp = dTemp + monthDelta
+            serviceMonths = serviceMonths + 1
+
+        #Last partial month:
+        while dTemp <= dEnd:
+            dTemp = dTemp + dayDelta
+            serviceDays = serviceDays + 1
+
+        #If partial months >= 1 month, change to months
+        while serviceDays > 29:
+            serviceMonths = serviceMonths + 1
+            serviceDays = serviceDays - 30
+        
+        self.qualifiedServiceDays = serviceDays
+        self.qualifiedServiceMonths = serviceMonths
 
         #Ch33 Rate is based on months of service
         #100% for  36+ months
@@ -82,6 +120,14 @@ class Member:
         else:
             self.entitlementRate = 0
 
+
+        #All members (who are entitled) start with 36 Months, 0 Days
+        if self.entitlementRate > 0:
+            self.entitlementRemainingMonths = 36
+        else:
+            self.entitlementRemainingMonths = 0
+
+        self.entitlementRemainingDays = 0
         
 
 
