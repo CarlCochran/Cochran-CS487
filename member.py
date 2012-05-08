@@ -38,7 +38,7 @@ class Member:
         self.endDay = endDay
 
         #Use service dates to calculate days of entitlement
-        self.calculateEntitlement()
+        #self.calculateEntitlement()
         
 
     def calculateEntitlement(self):

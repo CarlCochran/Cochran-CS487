@@ -1,7 +1,66 @@
 from easygui import *
 import member
 import MySQLdb as db
+from datetime import *
 
+def inputValidation(x):
+    #Input Validation
+    chars = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -')   #Valid alphabetic set
+    numbers = set('0123456789')                                             #Valid numeric set
+    errmsg = ""                                                     #Init to no errors
+    d1valid = False
+    d2valid = False
+    
+    for i in range(len(x.lname)):                            #Check for invalid characters in name
+        if any ((c in chars) for c in x.lname[i]):
+            continue
+        else:
+            errmsg += ('Last Name contains invalid characters.\n')
+            break
+    for i in range(len(x.fname)):
+        if any ((c in chars) for c in x.fname[i]):
+            continue
+        else:
+            errmsg += ('First Name contains invalid characters.\n')
+            break    
+    if (len(x.mi)) > 1 or not any((c in chars) for c in x.mi) and x.mi != "":
+        errmsg += ('Middle Initial contains invalid or too many characters.\n')
+        
+    try:
+        con = db.connect(host = 'instance12186.db.xeround.com',port=3915, \
+                       user='carl',passwd='graendal',db='gibillmembers')
+        cur = con.cursor()
+        cur.execute ("select * from ziprates where zipCode = %s", (x.zipCode))
+        if not cur.fetchone():
+            errmsg += ('Zip Code not in database\n')
+        cur.close()
+        con.close()
+    except:
+        errmsg += ('Rate database unavailable.  Contact your administrator.\n')
+
+    try:
+        d1 = date(int(x.startYear), int(x.startMonth), int(x.startDay))
+        d1valid = True
+    except:
+        errmsg += ('Date of Entry is Invalid.  Use format YYYY / MM / DD\n')
+
+    try:
+        d2 = date(int(x.endYear), int(x.endMonth), int(x.endDay))
+        d2valid = True
+    except:
+        errmsg += ('Date of Separation is Invalid.  Use format YYYY / MM / DD\n')
+
+    if d1valid and d2valid:
+        if d2 > date.today():
+            errmsg += ('Date of separation must have already passed.\n')
+        if d1 > d2:
+            errmsg += ('Date of separation must be after date of entry.\n')
+    
+    return errmsg
+     
+
+
+        
 
 def addMember(num):
     #Check if member already exists
@@ -43,50 +102,27 @@ def addMember(num):
         if errmsg == "": break                      #no errors
         fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)
 
-    #Input Validation
-    chars = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -')
-    numbers = set('0123456789')
-    while 1:
-        errmsg = ""
-        for i in range(len(fieldValues[0])):
-            if any ((c in chars) for c in fieldValues[0][i]):
-                continue
-            else:
-                errmsg += ('"%s" contains invalid characters.' % fieldNames[0])
-                break
-        for i in range(len(fieldValues[1])):
-            if any ((c in chars) for c in fieldValues[1][i]):
-                continue
-            else:
-                errmsg += ('"%s" contains invalid characters.' % fieldNames[1])
-                break    
-        if (len(fieldValues[2]) > 1 or not any((c in chars) for c in fieldValues[2])) and fieldValues[2] != "":
-            errmsg += ('"%s" contains invalid or too many characters.' % fieldNames[2])
-
-        if len(fieldValues[3]) != 5:
-            errmsg += ('"%s" is invalid.' % fieldNames[3])    
-
-        if errmsg == "": break                      #Input valid
-        fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)
                            
 
-    #Input Validation Passed: Assign Values    
-    lname = fieldValues[0]
-    fname = fieldValues[1]
-    mi = fieldValues[2]
-    zc = int(fieldValues[3])
-    ye = int(fieldValues[4])
-    me = int(fieldValues[5])
-    de = int(fieldValues[6])
-    yl = int(fieldValues[7])
-    ml = int(fieldValues[8])
-    dl = int(fieldValues[9])
-
+    #Prepare Input Validation   
+    while 1:
+        lname = fieldValues[0]
+        fname = fieldValues[1]
+        mi = fieldValues[2]
+        zc = fieldValues[3]
+        ye = fieldValues[4]
+        me = fieldValues[5]
+        de = fieldValues[6]
+        yl = fieldValues[7]
+        ml = fieldValues[8]
+        dl = fieldValues[9]
       
-    x = member.Member()
-    x.add(num, lname, fname, mi, zc, ye, me, de, yl, ml, dl)
-    print x.memNum, x.lname, x.fname, x.mi, x.zipCode, x.startYear, \
-          x.startMonth, x.startDay, x.endYear, x.endMonth, x.endDay
+        x = member.Member()
+        x.add(num, lname, fname, mi, zc, ye, me, de, yl, ml, dl)
+        errmsg = inputValidation(x)
+        if errmsg == "": break                                              #Passed validation
+        fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)  #Failed validation
+    
 
     #Connect to database for adding new member
     con = None
@@ -112,7 +148,7 @@ def addMember(num):
 
     
 def editMember(num):
-    print ('Edit Mode Initiated')
+
     #Connect to database to look up existing member
     con = None
     try:
@@ -133,13 +169,13 @@ def editMember(num):
         msg = ""
         for field in range(11):
             msg += "%-20s %-20s\n" %(desc[field][0],str(row[field]))
-        choices = ["Edit","Cancel"]
+        choices = ["Edit","Cancel","Delete Record"]
         reply = buttonbox(msg,choices=choices)
         if reply == "Cancel":
             cur.close()
             con.close()
             return None
-        else:
+        elif reply == "Edit":
             x = member.Member()
             x.add(num, row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10])
             msg = "Enter New Member Information"
@@ -191,6 +227,17 @@ def editMember(num):
             x = editMember(num)
             return x
 
+        else:
+            a = buttonbox(msg = 'Are you sure you want to delete this record?\n%s %s %s'% (row[0], \
+                        row[1], row[2]), title = 'Delete Record', choices=('Confirm','Cancel'), \
+                        image=None)
+            print num
+            if a:
+                cur.execute('DELETE FROM members WHERE id = %s' % num)
+                con.commit()
+            cur.close()
+            con.close()
+                        
     except db.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
         return None        
