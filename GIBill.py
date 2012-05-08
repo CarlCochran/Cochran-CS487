@@ -5,6 +5,7 @@ from datetime import *
 
 def inputValidation(x):
     #Input Validation
+                  
     chars = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -')   #Valid alphabetic set
     numbers = set('0123456789')                                             #Valid numeric set
     errmsg = ""                                                     #Init to no errors
@@ -12,17 +13,25 @@ def inputValidation(x):
     d2valid = False
     
     for i in range(len(x.lname)):                            #Check for invalid characters in name
+        if x.lname == "":
+            errmsg += ('Last Name must not be blank.\n')
+            break
         if any ((c in chars) for c in x.lname[i]):
             continue
         else:
             errmsg += ('Last Name contains invalid characters.\n')
             break
+        
     for i in range(len(x.fname)):
+        if x.fname == "":
+            errmsg += ('First Name must not be blank.\n')
+            break
         if any ((c in chars) for c in x.fname[i]):
             continue
         else:
             errmsg += ('First Name contains invalid characters.\n')
-            break    
+            break
+        
     if (len(x.mi)) > 1 or not any((c in chars) for c in x.mi) and x.mi != "":
         errmsg += ('Middle Initial contains invalid or too many characters.\n')
         
@@ -63,6 +72,8 @@ def inputValidation(x):
         
 
 def addMember(num):
+    fields = ['id','lname','fname','mi','zipcode','yrEntered','moEntered','daEntered','yrLeft','moLeft','daLeft']
+
     #Check if member already exists
     try:
         con = db.connect(host = 'instance12186.db.xeround.com',port=3915, \
@@ -78,47 +89,22 @@ def addMember(num):
         con.close()
     except db.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
-
-
         
-    msg = "Enter New Member Information"
+    msg = "Enter New Member Information: ",num
     title = "Add New Member"
-    msg = "Member Number: ",num
-    fieldNames = ["Last Name","First Name","Middle Initial","Zip Code","Year Entered Service","Month Entered Service","Day Entered Service","Year Left Service","Month Left Service","Day Left Service"]
+    fieldNames = ["Last Name","First Name","Middle Initial","Zip Code","Year Entered Service","Month Entered Service", \
+                  "Day Entered Service","Year Left Service","Month Left Service","Day Left Service"]
     fieldValues = []        #init to blank
     fieldValues = multenterbox(msg,title,fieldNames)
 
-    
-    #Check for fields left blank
-    while 1:
-        if fieldValues == None: return None
-        errmsg = ""
-        for i in range(len(fieldNames)):
-            if i == 2:                               #Skip middle initial, not required
-                continue
-            if fieldValues[i].strip() == "":
-                errmsg += ('"%s" is a required field.' % fieldNames[i])
-        print errmsg
-        if errmsg == "": break                      #no errors
-        fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)
+    if fieldValues == None: return None                             #Cancel was clicked               
 
-                           
-
-    #Prepare Input Validation   
-    while 1:
-        lname = fieldValues[0]
-        fname = fieldValues[1]
-        mi = fieldValues[2]
-        zc = fieldValues[3]
-        ye = fieldValues[4]
-        me = fieldValues[5]
-        de = fieldValues[6]
-        yl = fieldValues[7]
-        ml = fieldValues[8]
-        dl = fieldValues[9]
-      
+    #Input Validation   
+    while 1:   
         x = member.Member()
-        x.add(num, lname, fname, mi, zc, ye, me, de, yl, ml, dl)
+        x.add(num, fieldValues[0], fieldValues[1], fieldValues[2], fieldValues[3], fieldValues[4], \
+              fieldValues[5], fieldValues[6], fieldValues[7], fieldValues[8], fieldValues[9])
+
         errmsg = inputValidation(x)
         if errmsg == "": break                                              #Passed validation
         fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)  #Failed validation
@@ -148,7 +134,8 @@ def addMember(num):
 
     
 def editMember(num):
-
+    fields = ['id','lname','fname','mi','zipcode','yrEntered','moEntered','daEntered','yrLeft','moLeft','daLeft']
+    
     #Connect to database to look up existing member
     con = None
     try:
@@ -169,9 +156,9 @@ def editMember(num):
         msg = ""
         for field in range(11):
             msg += "%-20s %-20s\n" %(desc[field][0],str(row[field]))
-        choices = ["Edit","Cancel","Delete Record"]
+        choices = ["Edit","Done","Delete Record"]
         reply = buttonbox(msg,choices=choices)
-        if reply == "Cancel":
+        if reply == "Done":
             cur.close()
             con.close()
             return None
@@ -188,45 +175,27 @@ def editMember(num):
             fieldValues = multenterbox(msg,title,fieldNames,(x.lname,x.fname,x.mi,x.zipCode,x.startYear, \
                           x.startMonth,x.startDay,x.endYear,x.endMonth,x.endDay))
 
-            #Check for fields left blank
-            while 1:
-                if fieldValues == None: break
-                errmsg = ""
-                for i in range(len(fieldNames)):
-                    if fieldValues[i].strip() == "":
-                        errmsg += ('"%s" is a required field.' % fieldNames[i])
-                print errmsg
-                if errmsg == "": break                      #no errors
-                fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)
-            lname = fieldValues[0]
-            fname = fieldValues[1]
-            mi = fieldValues[2]
-            zc = int(fieldValues[3])
-            ye = int(fieldValues[4])
-            me = int(fieldValues[5])
-            de = int(fieldValues[6])
-            yl = int(fieldValues[7])
-            ml = int(fieldValues[8])
-            dl = int(fieldValues[9])
+            #Input Validation   
+            while 1:   
+                x = member.Member()
+                x.add(num, fieldValues[0], fieldValues[1], fieldValues[2], fieldValues[3], fieldValues[4], \
+                      fieldValues[5], fieldValues[6], fieldValues[7], fieldValues[8], fieldValues[9])
 
-      
-            x = member.Member()
-            x.add(num, lname, fname, mi, zc, ye, me, de, yl, ml, dl)
-            print x.memNum, x.lname, x.fname, x.mi, x.zipCode, x.startYear, \
-                  x.startMonth, x.startDay, x.endYear, x.endMonth, x.endDay
+                errmsg = inputValidation(x)
+                if errmsg == "": break                                              #Passed validation
+                fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)  #Failed validation
 
-
-            cur.execute('INSERT INTO members (id,lname,fname,mi,zipcode,yrEntered,moEntered,daEntered,yrLeft, \
-                            moLeft,daLeft) VALUES ("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s")' % \
-                            (x.memNum, x.lname, x.fname, x.mi, x.zipCode, x.startYear,\
-                            x.startMonth, x.startDay, x.endYear, x.endMonth, x.endDay))
+            for i in range(1, 10):
+                cur.execute("UPDATE members SET %s = '%s' WHERE id = %s"% (fields[i], fieldValues[i-1], num))
             con.commit()
             cur.close()
             con.close()
 
+            msgbox(msg = "Update Successful.")
             x = editMember(num)
             return x
 
+        #Delete Member Selected
         else:
             a = buttonbox(msg = 'Are you sure you want to delete this record?\n%s %s %s'% (row[0], \
                         row[1], row[2]), title = 'Delete Record', choices=('Confirm','Cancel'), \
