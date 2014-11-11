@@ -1,5 +1,5 @@
 # Post 9/11 GI Bill Accounting System
-# Carl COchran
+# Carl Cochran
 # CS 487-03
 # Professor: Virgil Bistriceanu
 # Spring 2012
